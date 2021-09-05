@@ -1,5 +1,4 @@
-[![Build Status](https://travis-ci.org/joohoi/acme-dns.svg?branch=master)](https://travis-ci.org/joohoi/acme-dns) [![Coverage Status](https://coveralls.io/repos/github/joohoi/acme-dns/badge.svg?branch=master)](https://coveralls.io/github/joohoi/acme-dns?branch=master) [![Go Report Card](https://goreportcard.com/badge/github.com/joohoi/acme-dns)](https://goreportcard.com/report/github.com/joohoi/acme-dns)
-# acme-dns
+[![Go](https://github.com/fritterhoff/acme-dns/actions/workflows/go_cov.yml/badge.svg)](https://github.com/fritterhoff/acme-dns/actions/workflows/go_cov.yml) [![codecov](https://codecov.io/gh/fritterhoff/acme-dns/branch/master/graph/badge.svg?token=NA6E3FJ5Z5)](https://codecov.io/gh/fritterhoff/acme-dns) [![Go Report Card](https://goreportcard.com/badge/github.com/fritterhoff/acme-dns)](https://goreportcard.com/report/github.com/fritterhoff/acme-dns)# acme-dns
 
 A simplified DNS server with a RESTful HTTP API to provide a simple way to automate ACME DNS challenges.
 
