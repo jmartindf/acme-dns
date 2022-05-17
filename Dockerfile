@@ -1,6 +1,6 @@
 FROM golang:1.18.2-alpine AS builder
 
-RUN apk add -U --no-cache ca-certificates gcc musl-dev
+RUN apk add -U --no-cache ca-certificates gcc musl-dev git
 
 WORKDIR /build
 COPY . .
