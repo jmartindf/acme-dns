@@ -1,4 +1,5 @@
 FROM golang:1.22.4-alpine AS builder
+LABEL maintainer="joona@kuori.org"
 
 RUN apk add -U --no-cache ca-certificates gcc musl-dev git
 
@@ -6,7 +7,6 @@ WORKDIR /build
 COPY . .
 
 RUN CGO_ENABLED=1 go build -ldflags="-extldflags=-static" -tags sqlite_omit_load_extension
-
 
 FROM scratch
 

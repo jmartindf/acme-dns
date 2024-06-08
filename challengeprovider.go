@@ -2,10 +2,7 @@ package main
 
 import (
 	"context"
-	"strings"
-
-	"github.com/libdns/libdns"
-	log "github.com/sirupsen/logrus"
+	"github.com/mholt/acmez/acme"
 )
 
 // ChallengeProvider implements go-acme/lego Provider interface which is used for ACME DNS challenge handling
@@ -18,29 +15,23 @@ func NewChallengeProvider(servers []*DNSServer) ChallengeProvider {
 	return ChallengeProvider{servers: servers}
 }
 
-func (c *ChallengeProvider) AppendRecords(ctx context.Context, zone string, recs []libdns.Record) ([]libdns.Record, error) {
-	var token string
-	for _, item := range recs {
-
-		log.WithFields(log.Fields{"name": item.Name, "value": item.Value, "type": item.Type}).Info("Attempting to set dns record")
-		if strings.Contains(item.Name, "acme-challenge") {
-			token = item.Value
-			break
-		}
-	}
-
+// Present is used for making the ACME DNS challenge token available for DNS
+func (c *ChallengeProvider) Present(ctx context.Context, challenge acme.Challenge) error {
 	for _, s := range c.servers {
-		s.PersonalKeyAuth = token
+		s.PersonalKeyAuth = challenge.DNS01KeyAuthorization()
 	}
-	return recs, nil
+	return nil
 }
 
-func (c *ChallengeProvider) DeleteRecords(ctx context.Context, zone string, recs []libdns.Record) ([]libdns.Record, error) {
-	for _, item := range recs {
-		log.WithFields(log.Fields{"name": item.Name, "value": item.Value, "type": item.Type}).Info("Attempting to unset dns record")
-	}
+// CleanUp is called after the run to remove the ACME DNS challenge tokens from DNS records
+func (c *ChallengeProvider) CleanUp(ctx context.Context, _ acme.Challenge) error {
 	for _, s := range c.servers {
 		s.PersonalKeyAuth = ""
 	}
-	return recs, nil
+	return nil
+}
+
+// Wait is a dummy function as we are just going to be ready to answer the challenge from the get-go
+func (c *ChallengeProvider) Wait(_ context.Context, _ acme.Challenge) error {
+	return nil
 }

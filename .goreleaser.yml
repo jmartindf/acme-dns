@@ -7,11 +7,15 @@ before:
     # you may remove this if you don't need go generate
     - go generate ./...
 builds:
-  - env:
-      - CGO_ENABLED=0
+  - binary: acme-dns
+    env:
+      - CGO_ENABLED=1
     goos:
       - linux
       - darwin
+    goarch:
+      - amd64
+      - arm64
 checksum:
   name_template: 'checksums.txt'
 snapshot:
@@ -22,3 +26,14 @@ changelog:
     exclude:
       - '^docs:'
       - '^test:'
+archives:
+  - id: tgz
+    format: tar.gz
+    files:
+      - LICENSE
+      - README.md
+      - Dockerfile
+      - config.cfg
+      - acme-dns.service
+signs:
+  - artifacts: checksum

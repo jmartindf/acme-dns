@@ -1,8 +1,27 @@
-[![Go](https://github.com/fritterhoff/acme-dns/actions/workflows/go_cov.yml/badge.svg)](https://github.com/fritterhoff/acme-dns/actions/workflows/go_cov.yml) [![codecov](https://codecov.io/gh/fritterhoff/acme-dns/branch/master/graph/badge.svg?token=NA6E3FJ5Z5)](https://codecov.io/gh/fritterhoff/acme-dns) [![Go Report Card](https://goreportcard.com/badge/github.com/fritterhoff/acme-dns)](https://goreportcard.com/report/github.com/fritterhoff/acme-dns)
-
-# acme-dns
+# jmartindf's version of acme-dns
 
 A simplified DNS server with a RESTful HTTP API to provide a simple way to automate ACME DNS challenges.
+
+## Why This Fork?
+
+I created [this fork](https://git.desertflood.com/jmartindf/acme-dns) to fix a few bugs that haven't yet been fixed upstream, in [joohoi/acme-dns](https://github.com/joohoi/acme-dns).
+
+- [#330](https://github.com/joohoi/acme-dns/issues/330) - README adduser command wrong
+- [#337](https://github.com/joohoi/acme-dns/issues/337) - error message every 10 minutes about managing the server certificate
+
+I applied three pending PRs:
+
+- [#351](https://github.com/joohoi/acme-dns/pull/351) - Fix certmagic usage, from [maddes-b](https://github.com/maddes-b)
+- [#346](https://github.com/joohoi/acme-dns/pull/346) - Don't convert static records to lowercase, from [max-privatevoid](https://github.com/max-privatevoid)
+- [#336](https://github.com/joohoi/acme-dns/pull/336) - Replace adduser with useradd, from [ihmels](https://github.com/ihmels)
+
+and stole a commit from [tjmullicani](https://github.com/tjmullicani), [15f802d](https://github.com/tjmullicani/acme-dns/commit/15f802df6cbf336f2f854b6239cfc0b70a81b739).
+
+I started from a base of [fritterhoff/acme-dns](https://github.com/fritterhoff/acme-dns), then applied PR [#313](https://github.com/joohoi/acme-dns/pull/313) - Update golint, dependencies and get to sane state. This reverted some of fritterhoff's changes and brought the code tree closer to the source, but with much updated dependencies.
+
+At some point, I'd also like to apply PR [#270](https://github.com/joohoi/acme-dns/pull/270) - Allow set-and-delete flow that is usually used by acme-clients.
+
+Finally, I dropped in a Nix [devshell](https://numtide.github.io/devshell/) flake, to make sure everything built properly. 
 
 ## Why?
 
@@ -126,18 +145,28 @@ See the INSTALL section for information on how to do this.
    go build
    ```
 
-3. Move the built acme-dns binary to a directory in your $PATH, for example:
-   `sudo mv acme-dns /usr/local/bin`
-4. Edit config.cfg to suit your needs (see [configuration](#configuration)). `acme-dns` will read the configuration file from `/etc/acme-dns/config.cfg` or `./config.cfg`, or a location specified with the `-c` flag.
-5. If your system has systemd, you can optionally install acme-dns as a service so that it will start on boot and be tracked by systemd. This also allows us to add the `CAP_NET_BIND_SERVICE` capability so that acme-dns can be run by a user other than root.
-   1. Make sure that you have moved the configuration file to `/etc/acme-dns/config.cfg` so that acme-dns can access it globally.
-   2. Move the acme-dns executable from `~/go/bin/acme-dns` to `/usr/local/bin/acme-dns` (Any location will work, just be sure to change `acme-dns.service` to match).
-   3. Create a minimal acme-dns user: `sudo adduser --system --gecos "acme-dns Service" --disabled-password --group --home /var/lib/acme-dns acme-dns`.
-   4. Move the systemd service unit from `acme-dns.service` to `/etc/systemd/system/acme-dns.service`.
-   5. Reload systemd units: `sudo systemctl daemon-reload`.
-   6. Enable acme-dns on boot: `sudo systemctl enable acme-dns.service`.
-   7. Run acme-dns: `sudo systemctl start acme-dns.service`.
-6. If you did not install the systemd service, run `acme-dns`. Please note that acme-dns needs to open a privileged port (53, domain), so it needs to be run with elevated privileges.
+3) Move the built acme-dns binary to a directory in your $PATH, for example:
+`sudo mv acme-dns /usr/local/bin`
+
+4) Edit config.cfg to suit your needs (see [configuration](#configuration)). `acme-dns` will read the configuration file from `/etc/acme-dns/config.cfg` or `./config.cfg`, or a location specified with the `-c` flag.
+
+5) If your system has systemd, you can optionally install acme-dns as a service so that it will start on boot and be tracked by systemd. This also allows us to add the `CAP_NET_BIND_SERVICE` capability so that acme-dns can be run by a user other than root.
+
+    1) Make sure that you have moved the configuration file to `/etc/acme-dns/config.cfg` so that acme-dns can access it globally.
+
+    2) Move the acme-dns executable from `~/go/bin/acme-dns` to `/usr/local/bin/acme-dns` (Any location will work, just be sure to change `acme-dns.service` to match).
+
+    3) Create a minimal acme-dns user: `sudo useradd --system --comment "acme-dns Service" --user-group --create-home --home /var/lib/acme-dns acme-dns`
+
+    4) Move the systemd service unit from `acme-dns.service` to `/etc/systemd/system/acme-dns.service`.
+
+    5) Reload systemd units: `sudo systemctl daemon-reload`.
+
+    6) Enable acme-dns on boot: `sudo systemctl enable acme-dns.service`.
+
+    7) Run acme-dns: `sudo systemctl start acme-dns.service`.
+
+6) If you did not install the systemd service, run `acme-dns`. Please note that acme-dns needs to open a privileged port (53, domain), so it needs to be run with elevated privileges.
 
 ### Using Docker
 
